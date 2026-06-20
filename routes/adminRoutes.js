@@ -9,6 +9,10 @@ import {
   archiveCourse,
   archiveAllCourses,
   unarchiveCourse,
+  getDepartments,
+  addDepartment,
+  editDepartment,
+  deleteDepartment,
 } from "../controllers/adminController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -31,5 +35,14 @@ router.get("/courses", getCourses);
 router.put("/courses/archive-all", archiveAllCourses);
 router.put("/courses/:id/archive", archiveCourse);
 router.put("/courses/:id/unarchive", unarchiveCourse);
+
+// Department management routes
+router.route("/departments")
+  .get(getDepartments)
+  .post(addDepartment);
+
+router.route("/departments/:id")
+  .put(editDepartment)
+  .delete(deleteDepartment);
 
 export default router;

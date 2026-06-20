@@ -10,7 +10,6 @@ import teacherRoutes from "./routes/teacherRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
-import departmentRoutes from "./routes/departmentRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -39,7 +38,6 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/assignments", assignmentRoutes);
-app.use("/api/departments", departmentRoutes);
 
 // Root Route
 app.get("/", (req, res) => {
