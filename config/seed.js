@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Department from "../models/Department.js";
 
 const seedAdmin = async () => {
   try {
@@ -20,8 +21,21 @@ const seedAdmin = async () => {
     } else {
       console.log("Admin account already exists in database. Skipping seed.");
     }
+
+    // Seed default departments
+    const departmentCount = await Department.countDocuments({});
+    if (departmentCount === 0) {
+      console.log("No departments found. Seeding default departments...");
+      const defaultDepartments = ["IT"];
+      await Department.insertMany(
+        defaultDepartments.map((name) => ({ name }))
+      );
+      console.log("Default departments seeded successfully!");
+    } else {
+      console.log("Departments already exist in database. Skipping department seed.");
+    }
   } catch (error) {
-    console.error(`Error seeding default admin: ${error.message}`);
+    console.error(`Error seeding default admin/departments: ${error.message}`);
   }
 };
 

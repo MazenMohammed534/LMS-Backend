@@ -906,3 +906,91 @@ Gets the logged-in student's own submission for a specific assignment.
     }
   }
   ```
+
+---
+
+## 7. Department Operations (`/api/departments`)
+
+### `GET /api/departments`
+Retrieves all departments in the system.
+- **Access:** Private (Any authenticated user)
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "departments": [
+      {
+        "_id": "60d0fe4f53112b32f8312991",
+        "name": "IT",
+        "createdAt": "2026-06-20T16:00:00.000Z",
+        "updatedAt": "2026-06-20T16:00:00.000Z"
+      },
+      {
+        "_id": "60d0fe4f53112b32f8312992",
+        "name": "Mecha",
+        "createdAt": "2026-06-20T16:00:00.000Z",
+        "updatedAt": "2026-06-20T16:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+### `POST /api/departments`
+Adds a new department.
+- **Access:** Admin only
+- **Content-Type:** `application/json`
+- **Request Body:**
+  ```json
+  {
+    "name": "Automotive"
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "message": "Department added successfully",
+    "department": {
+      "_id": "60d0fe4f53112b32f8312993",
+      "name": "Automotive",
+      "createdAt": "2026-06-20T16:05:00.000Z",
+      "updatedAt": "2026-06-20T16:05:00.000Z"
+    }
+  }
+  ```
+
+### `PUT /api/departments/:id`
+Updates the name of a department.
+- **Access:** Admin only
+- **Content-Type:** `application/json`
+- **Request Body:**
+  ```json
+  {
+    "name": "Auto"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Department updated successfully",
+    "department": {
+      "_id": "60d0fe4f53112b32f8312993",
+      "name": "Auto",
+      "createdAt": "2026-06-20T16:05:00.000Z",
+      "updatedAt": "2026-06-20T16:10:00.000Z"
+    }
+  }
+  ```
+
+### `DELETE /api/departments/:id`
+Deletes a department.
+- **Access:** Admin only
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Department deleted successfully"
+  }
+  ```
+
