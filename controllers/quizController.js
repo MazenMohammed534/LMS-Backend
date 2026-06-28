@@ -8,7 +8,7 @@ import Course from "../models/Course.js";
 // @access  Private/Teacher
 export const createQuiz = async (req, res) => {
   try {
-    const { courseId, title, dueDate, timeLimit, questions } = req.body;
+    const { courseId, title, dueDate, timeLimit, questions, questionsCount, questionsNumber } = req.body;
 
     if (!courseId || !title || !questions || !Array.isArray(questions)) {
       return res.status(400).json({ success: false, message: "Please provide courseId, title, and questions array" });
@@ -24,12 +24,18 @@ export const createQuiz = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to add a quiz to this course" });
     }
 
+    const finalQuestionsCount = (questionsCount !== undefined && questionsCount !== null)
+      ? Number(questionsCount)
+      : ((questionsNumber !== undefined && questionsNumber !== null)
+        ? Number(questionsNumber)
+        : questions.length);
+
     const quiz = await Quiz.create({
       courseId,
       title,
       dueDate,
       timeLimit: timeLimit || 0,
-      questionsCount: questions.length,
+      questionsCount: finalQuestionsCount,
       createdBy: req.user._id,
     });
 
@@ -214,7 +220,7 @@ export const editQuiz = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to edit this quiz" });
     }
 
-    const { title, dueDate, timeLimit, status, questions } = req.body;
+    const { title, dueDate, timeLimit, status, questions, questionsCount, questionsNumber } = req.body;
 
     quiz.title = title || quiz.title;
     quiz.dueDate = dueDate !== undefined ? dueDate : quiz.dueDate;
@@ -229,7 +235,17 @@ export const editQuiz = async (req, res) => {
         quizId: quiz._id,
       }));
       await Question.insertMany(questionsWithQuizId);
-      quiz.questionsCount = questions.length;
+      
+      const finalQuestionsCount = (questionsCount !== undefined && questionsCount !== null)
+        ? Number(questionsCount)
+        : ((questionsNumber !== undefined && questionsNumber !== null)
+          ? Number(questionsNumber)
+          : questions.length);
+      quiz.questionsCount = finalQuestionsCount;
+    } else if (questionsCount !== undefined && questionsCount !== null) {
+      quiz.questionsCount = Number(questionsCount);
+    } else if (questionsNumber !== undefined && questionsNumber !== null) {
+      quiz.questionsCount = Number(questionsNumber);
     }
 
     const updatedQuiz = await quiz.save();

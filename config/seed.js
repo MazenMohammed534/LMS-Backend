@@ -27,12 +27,12 @@ const seedAdmin = async () => {
     if (departmentCount === 0) {
       console.log("No departments found. Seeding default departments...");
       const defaultDepartments = ["IT"];
-      await Department.insertMany(
-        defaultDepartments.map((name) => ({ name }))
-      );
+      await Department.insertMany(defaultDepartments.map((name) => ({ name })));
       console.log("Default departments seeded successfully!");
     } else {
-      console.log("Departments already exist in database. Skipping department seed.");
+      console.log(
+        "Departments already exist in database. Skipping department seed.",
+      );
     }
   } catch (error) {
     console.error(`Error seeding default admin/departments: ${error.message}`);
