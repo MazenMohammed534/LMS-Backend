@@ -8,6 +8,7 @@ import {
   editQuiz,
   deleteQuiz,
   getQuizSubmissions,
+  getTeacherQuizzes,
 } from "../controllers/quizController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -21,6 +22,7 @@ router.get("/course/:courseId", getQuizzesByCourse);
 
 // Teacher-only management routes
 router.post("/", authorize("teacher"), createQuiz);
+router.get("/teacher", authorize("teacher"), getTeacherQuizzes);
 router.get("/:id", authorize("teacher"), getQuizById);
 router.put("/:id", authorize("teacher"), editQuiz);
 router.delete("/:id", authorize("teacher"), deleteQuiz);

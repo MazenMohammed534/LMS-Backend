@@ -560,6 +560,33 @@ Gets all quizzes for a specific course.
   }
   ```
 
+### `GET /api/quizzes/teacher`
+Gets all quizzes created by the logged-in teacher (populated with course details).
+- **Access:** Teacher only
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "quizzes": [
+      {
+        "_id": "60d0fe4f53112b32f8312077",
+        "courseId": {
+          "_id": "60d0fe4f53112b32f8312033",
+          "name": "Computer Networks"
+        },
+        "title": "Networks Quiz 1",
+        "status": "active",
+        "questionsCount": 1,
+        "timeLimit": 15,
+        "dueDate": "2026-06-25T23:59:59.000Z",
+        "createdBy": "60d0fe4f53112b32f8312022",
+        "createdAt": "2026-06-14T12:00:00.000Z",
+        "updatedAt": "2026-06-14T12:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
 ### `POST /api/quizzes`
 Creates a new quiz (with questions included).
 - **Access:** Teacher only

@@ -304,3 +304,19 @@ export const getQuizSubmissions = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Get all quizzes created by the logged-in teacher
+// @route   GET /api/quizzes/teacher
+// @access  Private/Teacher
+export const getTeacherQuizzes = async (req, res) => {
+  try {
+    const quizzes = await Quiz.find({ createdBy: req.user._id })
+      .populate("courseId", "name")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, quizzes });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
