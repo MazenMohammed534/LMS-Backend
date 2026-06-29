@@ -25,10 +25,6 @@ const assignmentSubmissionSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    score: {
-      type: Number,
-      default: 0,
-    },
     submittedAt: {
       type: Date,
       default: Date.now,

@@ -244,7 +244,7 @@ export const getAssignmentSubmissions = async (req, res) => {
 // @access  Private/Teacher
 export const gradeSubmission = async (req, res) => {
   try {
-    const { score, status } = req.body;
+    const { status } = req.body;
 
     const submission = await AssignmentSubmission.findById(req.params.submissionId);
     if (!submission) {
@@ -259,10 +259,6 @@ export const gradeSubmission = async (req, res) => {
     const course = await Course.findById(assignment.courseId);
     if (!course || course.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: "Not authorized to grade this submission" });
-    }
-
-    if (score !== undefined) {
-      submission.score = Number(score);
     }
     
     if (status) {

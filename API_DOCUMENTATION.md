@@ -905,7 +905,6 @@ Gets all student submissions for a specific assignment.
         "submittedFile": "uploads/assignments-1624301135.zip",
         "submittedText": "Here is my code submission.",
         "completionStatus": "pending",
-        "score": 0,
         "submittedAt": "2026-06-14T12:00:00.000Z"
       }
     ]
@@ -913,22 +912,21 @@ Gets all student submissions for a specific assignment.
   ```
 
 ### `PUT /api/assignments/submissions/:submissionId/grade`
-Grades a student's assignment submission.
+Approves or rejects a student's assignment submission.
 - **Access:** Teacher only
 - **Content-Type:** `application/json`
 - **Request Body:**
   ```json
   {
-    "score": 95,
-    "completionStatus": "approved" 
+    "status": "approved" 
   }
   ```
-  *(Note: `completionStatus` can be `"approved"` or `"rejected"`)*
+  *(Note: `status` can be `"approved"` or `"rejected"`)*
 - **Response (200 OK):**
   ```json
   {
     "success": true,
-    "message": "Submission graded successfully",
+    "message": "Submission status updated successfully",
     "submission": { ... }
   }
   ```
@@ -952,7 +950,6 @@ Submits a student's work for an assignment (supports file uploading).
       "submittedFile": "uploads/assignments-1624301135.zip",
       "submittedText": "Here is my code submission.",
       "completionStatus": "pending",
-      "score": 0,
       "submittedAt": "2026-06-14T12:00:00.000Z"
     }
   }
@@ -972,7 +969,6 @@ Gets the logged-in student's own submission for a specific assignment.
       "submittedFile": "uploads/assignments-1624301135.zip",
       "submittedText": "Here is my code submission.",
       "completionStatus": "pending",
-      "score": 0,
       "submittedAt": "2026-06-14T12:00:00.000Z"
     }
   }
