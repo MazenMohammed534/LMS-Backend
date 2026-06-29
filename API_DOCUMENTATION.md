@@ -301,6 +301,22 @@ Restores a single archived course.
 
 All routes in this section require the user to have the `teacher` role.
 
+### `GET /api/teacher/stats`
+Gets teacher dashboard stats including count of courses, assignments, quizzes, and unique students.
+- **Access:** Teacher only
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "stats": {
+      "courses": 5,
+      "assignments": 8,
+      "quizzes": 3,
+      "students": 42
+    }
+  }
+  ```
+
 ### `GET /api/teacher/courses`
 Gets all courses created by the logged-in teacher.
 - **Access:** Teacher only
@@ -777,7 +793,35 @@ Gets all assignments for a specific course.
         "description": "Implement a simple socket-based TCP server in Python.",
         "status": "active",
         "dueDate": "2026-06-22T23:59:59.000Z",
-        "createdBy": "60d0fe4f53112b32f8312022"
+        "createdBy": "60d0fe4f53112b32f8312022",
+        "createdAt": "2026-06-14T12:00:00.000Z",
+        "updatedAt": "2026-06-14T12:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+### `GET /api/assignments/teacher`
+Gets all assignments/tasks created by the logged-in teacher (populated with course details).
+- **Access:** Teacher only
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "assignments": [
+      {
+        "_id": "60d0fe4f53112b32f8312111",
+        "courseId": {
+          "_id": "60d0fe4f53112b32f8312033",
+          "name": "Computer Networks"
+        },
+        "title": "Build a simple TCP Server",
+        "description": "Implement a simple socket-based TCP server in Python.",
+        "status": "active",
+        "dueDate": "2026-06-22T23:59:59.000Z",
+        "createdBy": "60d0fe4f53112b32f8312022",
+        "createdAt": "2026-06-14T12:00:00.000Z",
+        "updatedAt": "2026-06-14T12:00:00.000Z"
       }
     ]
   }

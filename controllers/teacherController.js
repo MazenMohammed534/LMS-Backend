@@ -1,6 +1,8 @@
 import Course from "../models/Course.js";
 import User from "../models/User.js";
 import CourseMaterial from "../models/CourseMaterial.js";
+import Assignment from "../models/Assignment.js";
+import Quiz from "../models/Quiz.js";
 import fs from "fs";
 import path from "path";
 
@@ -216,3 +218,44 @@ export const deleteMaterial = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Get teacher dashboard stats
+// @route   GET /api/teacher/stats
+// @access  Private/Teacher
+export const getTeacherStats = async (req, res) => {
+  try {
+    const teacherId = req.user._id;
+
+    // 1. Count courses created by this teacher
+    const coursesCount = await Course.countDocuments({ createdBy: teacherId });
+
+    // 2. Count assignments created by this teacher
+    const assignmentsCount = await Assignment.countDocuments({ createdBy: teacherId });
+
+    // 3. Count quizzes created by this teacher
+    const quizzesCount = await Quiz.countDocuments({ createdBy: teacherId });
+
+    // 4. Calculate total unique students enrolled in all courses created by this teacher
+    const courses = await Course.find({ createdBy: teacherId });
+    const studentIds = new Set();
+    courses.forEach((course) => {
+      if (course.students && Array.isArray(course.students)) {
+        course.students.forEach((id) => studentIds.add(id.toString()));
+      }
+    });
+    const studentsCount = studentIds.size;
+
+    res.json({
+      success: true,
+      stats: {
+        courses: coursesCount,
+        assignments: assignmentsCount,
+        quizzes: quizzesCount,
+        students: studentsCount,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

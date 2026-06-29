@@ -8,6 +8,7 @@ import {
   getStudentSubmission,
   getAssignmentSubmissions,
   gradeSubmission,
+  getTeacherAssignments,
 } from "../controllers/assignmentController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -22,6 +23,7 @@ router.get("/course/:courseId", getAssignmentsByCourse);
 
 // Teacher-only assignment management routes
 router.post("/", authorize("teacher"), createAssignment);
+router.get("/teacher", authorize("teacher"), getTeacherAssignments);
 router.put("/:id", authorize("teacher"), editAssignment);
 router.delete("/:id", authorize("teacher"), deleteAssignment);
 router.get("/:id/submissions", authorize("teacher"), getAssignmentSubmissions);

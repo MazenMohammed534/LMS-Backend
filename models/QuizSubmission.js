@@ -31,7 +31,7 @@ const quizSubmissionSchema = new mongoose.Schema(
     },
     completionStatus: {
       type: String,
-      enum: ["started", "completed"],
+      enum: ["not completed", "completed"],
       default: "completed",
     },
     startedAt: {
@@ -45,7 +45,7 @@ const quizSubmissionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const QuizSubmission = mongoose.model("QuizSubmission", quizSubmissionSchema);

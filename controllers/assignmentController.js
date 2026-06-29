@@ -281,3 +281,19 @@ export const gradeSubmission = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Get all assignments created by the logged-in teacher
+// @route   GET /api/assignments/teacher
+// @access  Private/Teacher
+export const getTeacherAssignments = async (req, res) => {
+  try {
+    const assignments = await Assignment.find({ createdBy: req.user._id })
+      .populate("courseId", "name")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, assignments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

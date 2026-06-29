@@ -7,6 +7,7 @@ import {
   getCourseStudents,
   uploadMaterial,
   deleteMaterial,
+  getTeacherStats,
 } from "../controllers/teacherController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -15,6 +16,8 @@ const router = express.Router();
 
 router.use(protect);
 router.use(authorize("teacher"));
+
+router.get("/stats", getTeacherStats);
 
 router.route("/courses")
   .get(getCourses)
