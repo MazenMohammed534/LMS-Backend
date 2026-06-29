@@ -8,6 +8,7 @@ import {
   uploadMaterial,
   deleteMaterial,
   getTeacherStats,
+  getCourseDetails,
 } from "../controllers/teacherController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -24,6 +25,7 @@ router.route("/courses")
   .post(createCourse);
 
 router.route("/courses/:id")
+  .get(getCourseDetails)
   .put(editCourse)
   .delete(deleteCourse);
 

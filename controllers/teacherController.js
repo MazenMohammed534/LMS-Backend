@@ -6,13 +6,64 @@ import Quiz from "../models/Quiz.js";
 import fs from "fs";
 import path from "path";
 
-// @desc    Get courses taught by the logged-in teacher
-// @route   GET /api/teacher/courses
-// @access  Private/Teacher
 export const getCourses = async (req, res) => {
   try {
     const courses = await Course.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
-    res.json({ success: true, courses });
+    
+    const coursesWithCounts = await Promise.all(
+      courses.map(async (course) => {
+        const materialsCount = await CourseMaterial.countDocuments({ courseId: course._id });
+        const quizzesCount = await Quiz.countDocuments({ courseId: course._id });
+        const tasksCount = await Assignment.countDocuments({ courseId: course._id });
+        const discussionsCount = 0; // Placeholder for discussions count
+
+        return {
+          ...course.toObject(),
+          materialsCount,
+          quizzesCount,
+          tasksCount,
+          discussionsCount,
+        };
+      })
+    );
+
+    res.json({ success: true, courses: coursesWithCounts });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get details and stats for a single course
+// @route   GET /api/teacher/courses/:id
+// @access  Private/Teacher
+export const getCourseDetails = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    // Verify ownership
+    if (course.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to access this course" });
+    }
+
+    const materialsCount = await CourseMaterial.countDocuments({ courseId: course._id });
+    const quizzesCount = await Quiz.countDocuments({ courseId: course._id });
+    const tasksCount = await Assignment.countDocuments({ courseId: course._id });
+    const discussionsCount = 0; // Placeholder for discussions count
+
+    res.json({
+      success: true,
+      course: {
+        ...course.toObject(),
+        materialsCount,
+        quizzesCount,
+        tasksCount,
+        discussionsCount,
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

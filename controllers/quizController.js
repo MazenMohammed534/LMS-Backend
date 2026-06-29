@@ -73,6 +73,26 @@ export const getQuizzesByCourse = async (req, res) => {
     }
 
     const quizzes = await Quiz.find({ courseId }).sort({ createdAt: -1 });
+
+    // If student, populate submission status and score
+    if (req.user.role === "student") {
+      const quizzesWithStatus = await Promise.all(
+        quizzes.map(async (quiz) => {
+          const submission = await QuizSubmission.findOne({
+            quizId: quiz._id,
+            studentId: req.user._id,
+          });
+
+          return {
+            ...quiz.toObject(),
+            completionStatus: submission ? submission.completionStatus : "not completed",
+            score: submission ? submission.score : null,
+          };
+        })
+      );
+      return res.json({ success: true, quizzes: quizzesWithStatus });
+    }
+
     res.json({ success: true, quizzes });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

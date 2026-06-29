@@ -3,16 +3,67 @@ import CourseMaterial from "../models/CourseMaterial.js";
 import Assignment from "../models/Assignment.js";
 import Quiz from "../models/Quiz.js";
 
-// @desc    Get courses the logged-in student is enrolled in
-// @route   GET /api/student/courses
-// @access  Private/Student
 export const getEnrolledCourses = async (req, res) => {
   try {
     const courses = await Course.find({ students: req.user._id })
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, courses });
+    const coursesWithCounts = await Promise.all(
+      courses.map(async (course) => {
+        const materialsCount = await CourseMaterial.countDocuments({ courseId: course._id });
+        const quizzesCount = await Quiz.countDocuments({ courseId: course._id });
+        const tasksCount = await Assignment.countDocuments({ courseId: course._id });
+        const discussionsCount = 0; // Placeholder for discussions count
+
+        return {
+          ...course.toObject(),
+          materialsCount,
+          quizzesCount,
+          tasksCount,
+          discussionsCount,
+        };
+      })
+    );
+
+    res.json({ success: true, courses: coursesWithCounts });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get details and stats for a single course
+// @route   GET /api/student/courses/:courseId
+// @access  Private/Student
+export const getCourseDetails = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+
+    // Verify student is enrolled in this course
+    const course = await Course.findById(courseId).populate("createdBy", "name email");
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    if (!course.students.includes(req.user._id)) {
+      return res.status(403).json({ success: false, message: "You must be enrolled to view this course" });
+    }
+
+    const materialsCount = await CourseMaterial.countDocuments({ courseId });
+    const quizzesCount = await Quiz.countDocuments({ courseId });
+    const tasksCount = await Assignment.countDocuments({ courseId });
+    const discussionsCount = 0; // Placeholder for discussions count
+
+    res.json({
+      success: true,
+      course: {
+        ...course.toObject(),
+        materialsCount,
+        quizzesCount,
+        tasksCount,
+        discussionsCount,
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

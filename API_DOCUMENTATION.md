@@ -334,9 +334,38 @@ Gets all courses created by the logged-in teacher.
         "createdBy": "60d0fe4f53112b32f8312022",
         "isArchived": false,
         "cover": "uploads/default-course-cover.png",
-        "students": []
+        "students": [],
+        "materialsCount": 10,
+        "quizzesCount": 2,
+        "tasksCount": 3,
+        "discussionsCount": 0
       }
     ]
+  }
+  ```
+
+### `GET /api/teacher/courses/:id`
+Retrieves details and counts of materials, quizzes, tasks (assignments), and discussions for a specific course created by the logged-in teacher.
+- **Access:** Teacher only (must be creator of course)
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "course": {
+      "_id": "60d0fe4f53112b32f8312011",
+      "name": "Database Systems",
+      "code": "CS302",
+      "department": "Computer Science",
+      "year": 3,
+      "createdBy": "60d0fe4f53112b32f8312022",
+      "isArchived": false,
+      "cover": "uploads/default-course-cover.png",
+      "students": [],
+      "materialsCount": 10,
+      "quizzesCount": 2,
+      "tasksCount": 3,
+      "discussionsCount": 0
+    }
   }
   ```
 
@@ -483,9 +512,42 @@ Retrieves all courses in which the logged-in student is enrolled.
         },
         "isArchived": false,
         "cover": "uploads/custom-cover.png",
-        "students": ["60d0fe4f53112b32f8312011"]
+        "students": ["60d0fe4f53112b32f8312011"],
+        "materialsCount": 10,
+        "quizzesCount": 2,
+        "tasksCount": 3,
+        "discussionsCount": 0
       }
     ]
+  }
+  ```
+
+### `GET /api/student/courses/:courseId`
+Retrieves the details of a specific course, including counts of materials, quizzes, tasks (assignments), and discussions.
+- **Access:** Student only (must be enrolled)
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "course": {
+      "_id": "60d0fe4f53112b32f8312033",
+      "name": "Computer Networks",
+      "code": "CS401",
+      "department": "Computer Science",
+      "year": 4,
+      "createdBy": {
+        "_id": "60d0fe4f53112b32f8312022",
+        "name": "John Teacher",
+        "email": "teacher@example.com"
+      },
+      "isArchived": false,
+      "cover": "uploads/custom-cover.png",
+      "students": ["60d0fe4f53112b32f8312011"],
+      "materialsCount": 10,
+      "quizzesCount": 2,
+      "tasksCount": 3,
+      "discussionsCount": 0
+    }
   }
   ```
 
@@ -570,7 +632,9 @@ Gets all quizzes for a specific course.
         "status": "active",
         "questionsCount": 10,
         "timeLimit": 30,
-        "dueDate": "2026-06-20T23:59:59.000Z"
+        "dueDate": "2026-06-20T23:59:59.000Z",
+        "completionStatus": "completed",
+        "score": 8
       }
     ]
   }
@@ -795,7 +859,8 @@ Gets all assignments for a specific course.
         "dueDate": "2026-06-22T23:59:59.000Z",
         "createdBy": "60d0fe4f53112b32f8312022",
         "createdAt": "2026-06-14T12:00:00.000Z",
-        "updatedAt": "2026-06-14T12:00:00.000Z"
+        "updatedAt": "2026-06-14T12:00:00.000Z",
+        "completionStatus": "pending"
       }
     ]
   }
@@ -908,6 +973,29 @@ Gets all student submissions for a specific assignment.
         "submittedAt": "2026-06-14T12:00:00.000Z"
       }
     ]
+  }
+  ```
+
+### `GET /api/assignments/:assignmentId/submissions/student/:studentId`
+Gets a specific student's submission for a specific assignment.
+- **Access:** Teacher only
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "submission": {
+      "_id": "60d0fe4f53112b32f8312122",
+      "assignmentId": "60d0fe4f53112b32f8312111",
+      "studentId": {
+        "_id": "60d0fe4f53112b32f8312011",
+        "name": "Jane Doe",
+        "email": "jane@example.com"
+      },
+      "submittedFile": "uploads/assignments-1624301135.zip",
+      "submittedText": "Here is my code submission.",
+      "completionStatus": "pending",
+      "submittedAt": "2026-06-14T12:00:00.000Z"
+    }
   }
   ```
 

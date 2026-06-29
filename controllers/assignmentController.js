@@ -59,6 +59,25 @@ export const getAssignmentsByCourse = async (req, res) => {
     }
 
     const assignments = await Assignment.find({ courseId }).sort({ createdAt: -1 });
+
+    // If student, populate submission status
+    if (req.user.role === "student") {
+      const assignmentsWithStatus = await Promise.all(
+        assignments.map(async (assignment) => {
+          const submission = await AssignmentSubmission.findOne({
+            assignmentId: assignment._id,
+            studentId: req.user._id,
+          });
+
+          return {
+            ...assignment.toObject(),
+            completionStatus: submission ? submission.completionStatus : "not submitted",
+          };
+        })
+      );
+      return res.json({ success: true, assignments: assignmentsWithStatus });
+    }
+
     res.json({ success: true, assignments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -288,6 +307,38 @@ export const getTeacherAssignments = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json({ success: true, assignments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get a specific student's submission for an assignment (Teacher view)
+// @route   GET /api/assignments/:assignmentId/submissions/student/:studentId
+// @access  Private/Teacher
+export const getStudentSubmissionForTeacher = async (req, res) => {
+  try {
+    const { assignmentId, studentId } = req.params;
+
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ success: false, message: "Assignment not found" });
+    }
+
+    const course = await Course.findById(assignment.courseId);
+    if (!course || course.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to view this student's submission" });
+    }
+
+    const submission = await AssignmentSubmission.findOne({
+      assignmentId,
+      studentId,
+    }).populate("studentId", "name email");
+
+    if (!submission) {
+      return res.status(404).json({ success: false, message: "Submission not found for this student" });
+    }
+
+    res.json({ success: true, submission });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
