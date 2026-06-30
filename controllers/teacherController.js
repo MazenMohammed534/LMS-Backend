@@ -3,6 +3,9 @@ import User from "../models/User.js";
 import CourseMaterial from "../models/CourseMaterial.js";
 import Assignment from "../models/Assignment.js";
 import Quiz from "../models/Quiz.js";
+import AssignmentSubmission from "../models/AssignmentSubmission.js";
+import QuizSubmission from "../models/QuizSubmission.js";
+import Question from "../models/Question.js";
 import fs from "fs";
 import path from "path";
 
@@ -159,9 +162,34 @@ export const deleteCourse = async (req, res) => {
     }
     await CourseMaterial.deleteMany({ courseId: course._id });
 
+    // Find and delete assignments (tasks) and their submissions (including files)
+    const assignments = await Assignment.find({ courseId: course._id });
+    const assignmentIds = assignments.map(a => a._id);
+    
+    const assignmentSubmissions = await AssignmentSubmission.find({ assignmentId: { $in: assignmentIds } });
+    for (const sub of assignmentSubmissions) {
+      if (sub.submittedFile && fs.existsSync(sub.submittedFile)) {
+        try {
+          fs.unlinkSync(sub.submittedFile);
+        } catch (err) {
+          console.error(`Error deleting submission file: ${sub.submittedFile}`, err);
+        }
+      }
+    }
+    await AssignmentSubmission.deleteMany({ assignmentId: { $in: assignmentIds } });
+    await Assignment.deleteMany({ courseId: course._id });
+
+    // Find and delete quizzes, questions, and submissions
+    const quizzes = await Quiz.find({ courseId: course._id });
+    const quizIds = quizzes.map(q => q._id);
+    
+    await Question.deleteMany({ quizId: { $in: quizIds } });
+    await QuizSubmission.deleteMany({ quizId: { $in: quizIds } });
+    await Quiz.deleteMany({ courseId: course._id });
+
     await Course.findByIdAndDelete(req.params.id);
 
-    res.json({ success: true, message: "Course and associated materials deleted successfully" });
+    res.json({ success: true, message: "Course, materials, assignments, and quizzes deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
