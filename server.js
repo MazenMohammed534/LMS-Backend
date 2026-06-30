@@ -29,7 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve Uploaded Files Statically
 const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+const uploadFolder = process.env.VERCEL ? "/tmp" : path.join(__dirname, "/uploads");
+app.use("/uploads", express.static(uploadFolder));
 
 // Mount API Routes
 app.use("/api/auth", authRoutes);
