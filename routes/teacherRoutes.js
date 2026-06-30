@@ -9,6 +9,7 @@ import {
   deleteMaterial,
   getTeacherStats,
   getCourseDetails,
+  getCourseMaterials,
 } from "../controllers/teacherController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -30,8 +31,10 @@ router.route("/courses/:id")
   .delete(deleteCourse);
 
 router.get("/courses/:id/students", getCourseStudents);
+router.get("/courses/:id/materials", getCourseMaterials);
 
 router.post("/materials", upload.single("file"), uploadMaterial);
 router.delete("/materials/:id", deleteMaterial);
 
 export default router;
+

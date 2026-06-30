@@ -338,3 +338,27 @@ export const getTeacherStats = async (req, res) => {
   }
 };
 
+// @desc    Get materials for a course
+// @route   GET /api/teacher/courses/:id/materials
+// @access  Private/Teacher
+export const getCourseMaterials = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+
+    // Verify course exists and belongs to the teacher
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    if (course.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to view materials for this course" });
+    }
+
+    const materials = await CourseMaterial.find({ courseId }).sort({ uploadedAt: -1 });
+    res.json({ success: true, materials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
