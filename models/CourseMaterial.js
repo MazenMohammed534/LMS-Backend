@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import path from "path";
 
 const courseMaterialSchema = new mongoose.Schema(
   {
@@ -29,6 +30,16 @@ const courseMaterialSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+const transformFn = (doc, ret) => {
+  if (ret.file) {
+    ret.file = `/api/materials/download/${path.basename(ret.file)}`;
+  }
+  return ret;
+};
+
+courseMaterialSchema.set("toJSON", { transform: transformFn });
+courseMaterialSchema.set("toObject", { transform: transformFn });
 
 const CourseMaterial = mongoose.model("CourseMaterial", courseMaterialSchema);
 

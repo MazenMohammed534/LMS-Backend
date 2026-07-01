@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import path from "path";
 
 const assignmentSubmissionSchema = new mongoose.Schema(
   {
@@ -34,6 +35,16 @@ const assignmentSubmissionSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+const transformFn = (doc, ret) => {
+  if (ret.submittedFile) {
+    ret.submittedFile = `/api/materials/download/${path.basename(ret.submittedFile)}`;
+  }
+  return ret;
+};
+
+assignmentSubmissionSchema.set("toJSON", { transform: transformFn });
+assignmentSubmissionSchema.set("toObject", { transform: transformFn });
 
 const AssignmentSubmission = mongoose.model(
   "AssignmentSubmission",

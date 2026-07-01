@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import path from "path";
 
 const userSchema = new mongoose.Schema(
   {
@@ -39,6 +40,18 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+const transformFn = (doc, ret) => {
+  if (ret.avatar && !ret.avatar.startsWith("http://") && !ret.avatar.startsWith("https://")) {
+    ret.avatar = `/api/materials/download/${path.basename(ret.avatar)}`;
+  }
+  // Delete password from output if present
+  delete ret.password;
+  return ret;
+};
+
+userSchema.set("toJSON", { transform: transformFn });
+userSchema.set("toObject", { transform: transformFn });
 
 // Encrypt password using bcrypt
 userSchema.pre("save", async function (next) {

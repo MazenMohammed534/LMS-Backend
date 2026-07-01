@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import connectDB from "./config/db.js";
 import seedAdmin from "./config/seed.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -31,6 +32,19 @@ app.use(express.urlencoded({ extended: true }));
 const __dirname = path.resolve();
 const uploadFolder = process.env.VERCEL ? "/tmp" : path.join(__dirname, "/uploads");
 app.use("/uploads", express.static(uploadFolder));
+
+// Public Download Endpoint
+app.get("/api/materials/download/:fileName", (req, res) => {
+  const fileName = req.params.fileName;
+  const safeFileName = path.basename(fileName);
+  const filePath = path.join(uploadFolder, safeFileName);
+
+  if (fs.existsSync(filePath)) {
+    res.download(filePath, safeFileName);
+  } else {
+    res.status(404).json({ success: false, message: "File not found" });
+  }
+});
 
 // Mount API Routes
 app.use("/api/auth", authRoutes);
