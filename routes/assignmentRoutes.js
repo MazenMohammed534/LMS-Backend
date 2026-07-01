@@ -10,6 +10,7 @@ import {
   gradeSubmission,
   getTeacherAssignments,
   getStudentSubmissionForTeacher,
+  getSubmissionById,
 } from "../controllers/assignmentController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -30,6 +31,7 @@ router.delete("/:id", authorize("teacher"), deleteAssignment);
 router.get("/:id/submissions", authorize("teacher"), getAssignmentSubmissions);
 router.get("/:assignmentId/submissions/student/:studentId", authorize("teacher"), getStudentSubmissionForTeacher);
 router.put("/submissions/:submissionId/grade", authorize("teacher"), gradeSubmission);
+router.get("/submissions/:submissionId", getSubmissionById);
 
 // Student-only assignment submission routes
 router.post("/:id/submit", authorize("student"), upload.single("file"), submitAssignment);

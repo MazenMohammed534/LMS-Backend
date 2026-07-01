@@ -71,6 +71,7 @@ export const getAssignmentsByCourse = async (req, res) => {
 
           return {
             ...assignment.toObject(),
+            isSubmitted: !!submission,
             completionStatus: submission ? submission.completionStatus : "not submitted",
           };
         })
@@ -227,7 +228,11 @@ export const getStudentSubmission = async (req, res) => {
       studentId: req.user._id,
     });
 
-    res.json({ success: true, submission });
+    res.json({
+      success: true,
+      isSubmitted: !!submission,
+      submission,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -290,6 +295,43 @@ export const gradeSubmission = async (req, res) => {
     }
 
     await submission.save();
+
+    res.json({ success: true, submission });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get a specific submission by submission ID
+// @route   GET /api/assignments/submissions/:submissionId
+// @access  Private (Teacher or Student owner)
+export const getSubmissionById = async (req, res) => {
+  try {
+    const submission = await AssignmentSubmission.findById(req.params.submissionId)
+      .populate("studentId", "name email");
+
+    if (!submission) {
+      return res.status(404).json({ success: false, message: "Submission not found" });
+    }
+
+    const assignment = await Assignment.findById(submission.assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ success: false, message: "Associated assignment not found" });
+    }
+
+    // Verify access
+    if (req.user.role === "teacher") {
+      const course = await Course.findById(assignment.courseId);
+      if (!course || course.createdBy.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ success: false, message: "Not authorized to view this submission" });
+      }
+    } else if (req.user.role === "student") {
+      if (submission.studentId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ success: false, message: "Not authorized to view this submission" });
+      }
+    } else if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Not authorized to view this submission" });
+    }
 
     res.json({ success: true, submission });
   } catch (error) {
