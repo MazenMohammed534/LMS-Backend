@@ -145,6 +145,10 @@ export const deleteUser = async (req, res) => {
       });
     }
 
+    if (user.role === "teacher") {
+      await Course.deleteMany({ createdBy: user._id });
+    }
+
     await User.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "User deleted successfully" });
   } catch (error) {
