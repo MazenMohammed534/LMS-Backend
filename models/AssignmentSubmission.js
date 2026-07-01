@@ -24,6 +24,7 @@ const assignmentSubmissionSchema = new mongoose.Schema(
     submittedText: {
       type: String,
       default: "",
+      required: true,
     },
     completionStatus: {
       type: String,
