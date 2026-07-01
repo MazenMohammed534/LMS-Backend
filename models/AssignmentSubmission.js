@@ -17,6 +17,10 @@ const assignmentSubmissionSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    submittedFileOriginalName: {
+      type: String,
+      default: "",
+    },
     submittedText: {
       type: String,
       default: "",

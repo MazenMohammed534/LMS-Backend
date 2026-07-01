@@ -194,6 +194,7 @@ export const submitAssignment = async (req, res) => {
       submission.submittedText = submittedText !== undefined ? submittedText : submission.submittedText;
       if (req.file) {
         submission.submittedFile = req.file.path;
+        submission.submittedFileOriginalName = req.file.originalname;
       }
       submission.completionStatus = "pending";
       submission.submittedAt = Date.now();
@@ -204,6 +205,7 @@ export const submitAssignment = async (req, res) => {
         studentId: req.user._id,
         submittedText: submittedText || "",
         submittedFile: req.file ? req.file.path : "",
+        submittedFileOriginalName: req.file ? req.file.originalname : "",
         completionStatus: "pending", // becomes "Done" once graded
         submittedAt: Date.now(),
       });
