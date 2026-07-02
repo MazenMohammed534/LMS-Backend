@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import path from "path";
 
 const courseSchema = new mongoose.Schema(
   {
@@ -46,6 +47,16 @@ const courseSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+const transformFn = (doc, ret) => {
+  if (ret.cover) {
+    ret.cover = `/api/materials/download/${path.basename(ret.cover)}`;
+  }
+  return ret;
+};
+
+courseSchema.set("toJSON", { transform: transformFn });
+courseSchema.set("toObject", { transform: transformFn });
 
 const Course = mongoose.model("Course", courseSchema);
 
