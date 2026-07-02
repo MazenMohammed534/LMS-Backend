@@ -50,7 +50,7 @@ const courseSchema = new mongoose.Schema(
 
 const transformFn = (doc, ret) => {
   if (ret.cover) {
-    ret.cover = `/api/materials/download/${path.basename(ret.cover)}`;
+    ret.cover = `api/materials/download/${path.basename(ret.cover)}`;
   }
   return ret;
 };
