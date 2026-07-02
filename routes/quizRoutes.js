@@ -9,6 +9,7 @@ import {
   deleteQuiz,
   getQuizSubmissions,
   getTeacherQuizzes,
+  getStudentQuizSubmission,
 } from "../controllers/quizController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -31,5 +32,6 @@ router.get("/:id/submissions", authorize("teacher"), getQuizSubmissions);
 // Student-only quiz taking routes
 router.get("/:id/take", authorize("student"), getQuizForTaking);
 router.post("/:id/submit", authorize("student"), submitQuiz);
+router.get("/:id/submission", authorize("student"), getStudentQuizSubmission);
 
 export default router;

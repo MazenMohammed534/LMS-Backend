@@ -340,3 +340,56 @@ export const getTeacherQuizzes = async (req, res) => {
   }
 };
 
+// @desc    Get student's own submission details for a quiz
+// @route   GET /api/quizzes/:id/submission
+// @access  Private/Student
+export const getStudentQuizSubmission = async (req, res) => {
+  try {
+    const quizId = req.params.id;
+    const studentId = req.user._id;
+
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ success: false, message: "Quiz not found" });
+    }
+
+    const submission = await QuizSubmission.findOne({ quizId, studentId });
+    if (!submission) {
+      return res.status(404).json({ success: false, message: "Submission not found" });
+    }
+
+    // Retrieve all questions for this quiz
+    const questions = await Question.find({ quizId });
+
+    // Combine questions with student chosen answers and correct answers
+    const questionsWithAnswers = questions.map((question) => {
+      const studentAnswerObj = submission.answers.find(
+        (ans) => ans.questionId.toString() === question._id.toString()
+      );
+      
+      return {
+        _id: question._id,
+        text: question.text,
+        options: question.options,
+        points: question.points,
+        correctAnswer: question.correctAnswer,
+        studentAnswer: studentAnswerObj ? studentAnswerObj.answer : "",
+      };
+    });
+
+    res.json({
+      success: true,
+      quiz,
+      submission: {
+        _id: submission._id,
+        score: submission.score,
+        completionStatus: submission.completionStatus,
+        submittedAt: submission.submittedAt,
+        questions: questionsWithAnswers,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
